@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🥚 蛋型MBTI性格测评</title>
+    <title>🥚 蛋仔MBTI性格测评</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
@@ -394,19 +394,19 @@ const PERSON_DATA = {
     "ENTJ": { name: "霸气蛋", imgUrl: "images/ENTJ.png", tags: "天生领导者 | 果断自信 | 擅长统筹", summary: "视野长远，自信果断，擅长制定目标、统筹安排，拥有很强的组织领导能力，敢于直面挑战与变化。", advantage: "目标宏大、决策果断、规划能力突出、抗压能力强", attention: "容易强势，忽略他人感受；耐心不足；难以接受低效方案", suggestion: "耐心倾听不同意见；适当放慢节奏；学会鼓励而非催促同伴。" },
     "ISFP": { name: "艺术蛋", imgUrl: "images/ISFP.png", tags: "温润包容 | 审美敏锐 | 随性自由", summary: "温润包容，很少与人起冲突，待人友善。心思细腻敏锐，拥有不错的审美与感知力，善于发现生活中的美感。", advantage: "共情力强、动手能力强、观察力细腻", attention: "遇到压力容易回避，容易拖延长期任务，不擅长主动表达", suggestion: "给自己设立简短的每日小目标；大胆说出自己的真实感受。" },
     "ISTP": { name: "自由蛋", imgUrl: "images/ISTP.png", tags: "冷静理智 | 动手实践 | 灵活应变", summary: "行动派，比起空谈更愿意动手尝试。遇事冷静客观，善于独立观察分析问题，边界感清晰。", advantage: "临场应变强、动手能力突出、遇事沉着冷静", attention: "容易忽视长期规划；不喜主动沟通；有时会忽视他人情绪", suggestion: "学会适当兼顾他人感受；为重要学习任务建立基础时间表。" },
-    "ESFP": { name: "社交蛋", imgUrl: "images/ESFP.jpg", tags: "热情外向 | 擅长表达 | 带动氛围", summary: "精力充沛，擅长社交，乐于成为集体里活跃气氛的人。表达力强，乐于展示自己，擅长直观体验式的学习。", advantage: "表达大方、亲和力强、临场表现优秀、善于调动氛围", attention: "很难长期专注枯燥的任务；容易忽略长远规划", suggestion: "制定阶段性小目标；学会平衡娱乐与学习。" },
-    "ESTP": { name: "潇洒蛋", imgUrl: "images/ESTP.jpg", tags: "反应敏捷 | 敢于挑战 | 务实高效", summary: "头脑灵活、反应快，幽默健谈，适应力极强。面对突发问题可以快速想出解决方案，看重现实可行的方法。", advantage: "应变力强、行动果断、擅长实践、社交灵活", attention: "容易缺乏耐心，难以坚持长期枯燥学习；容易冲动行事", suggestion: "培养长期目标意识；做事前短暂冷静思考后果。" },
-    "ISTJ": { name: "模范蛋", imgUrl: "images/ISTJ.jpg", tags: "自律严谨 | 踏实靠谱 | 严守规则", summary: "自律踏实，习惯按规则稳步前进，做事认真负责，信守承诺。讲究条理，擅长整理归纳与落实基础知识。", advantage: "自律守信、执行力稳定、基础扎实、责任心强", attention: "不容易接纳新颖思路；面对突发变动容易焦虑", suggestion: "适当尝试开放性思考题；学会灵活看待计划变化。" },
-    "ISFJ": { name: "守护蛋", imgUrl: "images/ISFJ.jpg", tags: "细心体贴 | 默默付出 | 温柔守护", summary: "十分在意身边氛围的和谐，乐于主动帮助同学、体谅他人情绪。细心周到，习惯默默照顾身边人的需求。", advantage: "细心体贴、耐心充足、执行力稳定、乐于助人", attention: "容易过度付出、不懂拒绝；压抑自身情绪；害怕冲突", suggestion: "学会合理拒绝他人；优先保障自己的学习任务。" },
-    "ESTJ": { name: "卷卷蛋", imgUrl: "images/ESTJ.jpg", tags: "高效统筹 | 目标明确 | 规则守护", summary: "执行力强，目标清晰，擅长组织安排与统筹事务。做事讲究效率，看重学习与付出带来的实际收获。", advantage: "组织能力强、自律高效、目标感足、责任心强", attention: "有时过于看重结果；容易忽略同伴情绪", suggestion: "多倾听他人不同想法；预留弹性时间应对变化。" },
-    "ESFJ": { name: "天使蛋", imgUrl: "images/ESFJ.jpg", tags: "热忱友善 | 凝聚力强 | 贴心关怀", summary: "待人热忱，主动关心身边同学，善于维系友好的集体氛围。重视他人的认可，希望身边环境和睦融洽。", advantage: "亲和力强、热心友善、善于协调人际关系", attention: "容易过度在意别人看法；优先顾及别人而耽误自己", suggestion: "分清事情优先级；勇敢合理拒绝，照顾好自己。" },
-    "INFJ": { name: "神秘蛋", imgUrl: "images/INFJ.jpg", tags: "深邃洞察 | 敏锐共情 | 精神探索", summary: "善于思考事物背后的深层意义，共情敏锐，能感知他人隐藏的情绪。偏爱人文思辨，擅长深度理解。", advantage: "洞察力强、理解力深刻、善于独立深度思考", attention: "容易过度内耗；社交消耗大；想法过于理想化", suggestion: "预留充足独处时间；减少过度自我反思。" },
-    "INTJ": { name: "智慧蛋", imgUrl: "images/INTJ.jpg", tags: "远见卓识 | 逻辑缜密 | 独立建构", summary: "擅长长远规划，逻辑思维突出，追求高效。习惯提前设定长远目标，反向规划当下任务，不喜低效社交。", advantage: "逻辑缜密、擅长规划、自主学习能力强", attention: "容易忽视他人情绪；对低效的人和事缺乏耐心", suggestion: "学习换位思考；预留弹性时间应对突发变化。" },
-    "INFP": { name: "精灵蛋", imgUrl: "images/INFP.jpg", tags: "理想主义 | 情感细腻 | 创意丰富", summary: "拥有丰富的内心世界，善于感知微小美好，重视真诚与善意。内心想法充沛富有创意，对文学艺术有独特悟性。", advantage: "想象力丰富、共情力强、文字表达富有感染力", attention: "容易拖延、情绪内耗；面对压力容易逃避", suggestion: "建立简单可完成的短期任务；接纳不完美的自己。" },
-    "INTP": { name: "逻辑蛋", imgUrl: "images/INTP.jpg", tags: "刨根问底 | 脑洞大开 | 思维自由", summary: "思维发散、好奇心旺盛，喜欢钻研原理与探索可能性。讨厌死板规则，感兴趣的内容会深度钻研。", advantage: "脑洞开阔、善于逻辑思辨、求知欲强", attention: "执行力偏弱，容易拖延；不太擅长落实琐碎任务", suggestion: "拆分大任务为短时小任务；固定基础练习时间。" },
-    "ENFP": { name: "活力蛋", imgUrl: "images/ENFP.jpg", tags: "阳光感染 | 灵感迸发 | 充满热情", summary: "乐观开朗，感染力强，想法丰富，乐于带动身边人。灵感充沛，讨厌刻板重复的学习模式。", advantage: "想象力丰富、感染力强、创意突出", attention: "兴趣容易转移；任务容易拖延；害怕单调重复", suggestion: "用多样化方式学习；设置任务截止提醒。" },
-    "ENFJ": { name: "暖暖蛋", imgUrl: "images/ENFJ.jpg", tags: "号召力强 | 正义温暖 | 鼓励陪伴", summary: "善于沟通，拥有出色的社交与号召力，愿意主动帮助、鼓励身边同学，希望带动身边人一起进步。", advantage: "共情力强、善于沟通、号召力强、乐于助人", attention: "容易背负他人情绪；对他人期待过高；容易消耗自己", suggestion: "学会设立情绪边界；留出自我休整与休息时间。" },
-    "ENTP": { name: "辩论蛋", imgUrl: "images/ENTP.jpg", tags: "思维敏捷 | 多元思考 | 妙趣横生", summary: "思维敏捷，好奇心旺盛，善于发现逻辑漏洞，喜欢交流探讨不同观点，知识面广，适应各类话题。", advantage: "思维灵活、知识面广、善于多角度思考", attention: "容易为辩论而争辩；难以坚持单调基础积累", suggestion: "重视基础巩固；选定想法之后坚持落地执行。" }
+    "ESFP": { name: "社交蛋", imgUrl: "images/ESFP.png", tags: "热情外向 | 擅长表达 | 带动氛围", summary: "精力充沛，擅长社交，乐于成为集体里活跃气氛的人。表达力强，乐于展示自己，擅长直观体验式的学习。", advantage: "表达大方、亲和力强、临场表现优秀、善于调动氛围", attention: "很难长期专注枯燥的任务；容易忽略长远规划", suggestion: "制定阶段性小目标；学会平衡娱乐与学习。" },
+    "ESTP": { name: "潇洒蛋", imgUrl: "images/ESTP.png", tags: "反应敏捷 | 敢于挑战 | 务实高效", summary: "头脑灵活、反应快，幽默健谈，适应力极强。面对突发问题可以快速想出解决方案，看重现实可行的方法。", advantage: "应变力强、行动果断、擅长实践、社交灵活", attention: "容易缺乏耐心，难以坚持长期枯燥学习；容易冲动行事", suggestion: "培养长期目标意识；做事前短暂冷静思考后果。" },
+    "ISTJ": { name: "模范蛋", imgUrl: "images/ISTJ.png", tags: "自律严谨 | 踏实靠谱 | 严守规则", summary: "自律踏实，习惯按规则稳步前进，做事认真负责，信守承诺。讲究条理，擅长整理归纳与落实基础知识。", advantage: "自律守信、执行力稳定、基础扎实、责任心强", attention: "不容易接纳新颖思路；面对突发变动容易焦虑", suggestion: "适当尝试开放性思考题；学会灵活看待计划变化。" },
+    "ISFJ": { name: "守护蛋", imgUrl: "images/ISFJ.png", tags: "细心体贴 | 默默付出 | 温柔守护", summary: "十分在意身边氛围的和谐，乐于主动帮助同学、体谅他人情绪。细心周到，习惯默默照顾身边人的需求。", advantage: "细心体贴、耐心充足、执行力稳定、乐于助人", attention: "容易过度付出、不懂拒绝；压抑自身情绪；害怕冲突", suggestion: "学会合理拒绝他人；优先保障自己的学习任务。" },
+    "ESTJ": { name: "卷卷蛋", imgUrl: "images/ESTJ.png", tags: "高效统筹 | 目标明确 | 规则守护", summary: "执行力强，目标清晰，擅长组织安排与统筹事务。做事讲究效率，看重学习与付出带来的实际收获。", advantage: "组织能力强、自律高效、目标感足、责任心强", attention: "有时过于看重结果；容易忽略同伴情绪", suggestion: "多倾听他人不同想法；预留弹性时间应对变化。" },
+    "ESFJ": { name: "天使蛋", imgUrl: "images/ESFJ.png", tags: "热忱友善 | 凝聚力强 | 贴心关怀", summary: "待人热忱，主动关心身边同学，善于维系友好的集体氛围。重视他人的认可，希望身边环境和睦融洽。", advantage: "亲和力强、热心友善、善于协调人际关系", attention: "容易过度在意别人看法；优先顾及别人而耽误自己", suggestion: "分清事情优先级；勇敢合理拒绝，照顾好自己。" },
+    "INFJ": { name: "神秘蛋", imgUrl: "images/INFJ.png", tags: "深邃洞察 | 敏锐共情 | 精神探索", summary: "善于思考事物背后的深层意义，共情敏锐，能感知他人隐藏的情绪。偏爱人文思辨，擅长深度理解。", advantage: "洞察力强、理解力深刻、善于独立深度思考", attention: "容易过度内耗；社交消耗大；想法过于理想化", suggestion: "预留充足独处时间；减少过度自我反思。" },
+    "INTJ": { name: "智慧蛋", imgUrl: "images/INTJ.png", tags: "远见卓识 | 逻辑缜密 | 独立建构", summary: "擅长长远规划，逻辑思维突出，追求高效。习惯提前设定长远目标，反向规划当下任务，不喜低效社交。", advantage: "逻辑缜密、擅长规划、自主学习能力强", attention: "容易忽视他人情绪；对低效的人和事缺乏耐心", suggestion: "学习换位思考；预留弹性时间应对突发变化。" },
+    "INFP": { name: "精灵蛋", imgUrl: "images/INFP.png", tags: "理想主义 | 情感细腻 | 创意丰富", summary: "拥有丰富的内心世界，善于感知微小美好，重视真诚与善意。内心想法充沛富有创意，对文学艺术有独特悟性。", advantage: "想象力丰富、共情力强、文字表达富有感染力", attention: "容易拖延、情绪内耗；面对压力容易逃避", suggestion: "建立简单可完成的短期任务；接纳不完美的自己。" },
+    "INTP": { name: "逻辑蛋", imgUrl: "images/INTP.png", tags: "刨根问底 | 脑洞大开 | 思维自由", summary: "思维发散、好奇心旺盛，喜欢钻研原理与探索可能性。讨厌死板规则，感兴趣的内容会深度钻研。", advantage: "脑洞开阔、善于逻辑思辨、求知欲强", attention: "执行力偏弱，容易拖延；不太擅长落实琐碎任务", suggestion: "拆分大任务为短时小任务；固定基础练习时间。" },
+    "ENFP": { name: "活力蛋", imgUrl: "images/ENFP.png", tags: "阳光感染 | 灵感迸发 | 充满热情", summary: "乐观开朗，感染力强，想法丰富，乐于带动身边人。灵感充沛，讨厌刻板重复的学习模式。", advantage: "想象力丰富、感染力强、创意突出", attention: "兴趣容易转移；任务容易拖延；害怕单调重复", suggestion: "用多样化方式学习；设置任务截止提醒。" },
+    "ENFJ": { name: "暖暖蛋", imgUrl: "images/ENFJ.png", tags: "号召力强 | 正义温暖 | 鼓励陪伴", summary: "善于沟通，拥有出色的社交与号召力，愿意主动帮助、鼓励身边同学，希望带动身边人一起进步。", advantage: "共情力强、善于沟通、号召力强、乐于助人", attention: "容易背负他人情绪；对他人期待过高；容易消耗自己", suggestion: "学会设立情绪边界；留出自我休整与休息时间。" },
+    "ENTP": { name: "辩论蛋", imgUrl: "images/ENTP.png", tags: "思维敏捷 | 多元思考 | 妙趣横生", summary: "思维敏捷，好奇心旺盛，善于发现逻辑漏洞，喜欢交流探讨不同观点，知识面广，适应各类话题。", advantage: "思维灵活、知识面广、善于多角度思考", attention: "容易为辩论而争辩；难以坚持单调基础积累", suggestion: "重视基础巩固；选定想法之后坚持落地执行。" }
 };
 
 // ===================== 全局交互与状态管理 =====================
