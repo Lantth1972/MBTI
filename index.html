@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🥚 蛋型MBTI性格测评</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#A3D9C9',
+                        soft: '#F4F9F4',
+                        accent: '#FFB7B2'
+                    },
+                    fontFamily: {
+                        cute: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ===== 清新可爱全局背景与微特效 ===== */
+        body {
+            background-color: #F8F6F0;
+            background-image: radial-gradient(#E8E2D5 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        @keyframes float-egg {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        .egg-item {
+            animation: float-egg 2.5s ease-in-out infinite;
+        }
+        .egg-item:nth-child(2n){ animation-delay: 0.2s; }
+        .egg-item:nth-child(3n){ animation-delay: 0.4s; }
+        .egg-item:nth-child(4n){ animation-delay: 0.6s; }
+
+        .fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .btn-bounce {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-bounce:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+        }
+        .btn-bounce:active:not(:disabled) {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .modal-mask {
+            background: rgba(90, 80, 70, 0.4);
+            backdrop-filter: blur(4px);
+        }
+
+        /* 打字机效果及光标 */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.1em;
+            background-color: currentColor;
+            margin-left: 2px;
+            vertical-align: text-bottom;
+            animation: blink 0.8s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 选项卡片选中态 */
+        .opt-card {
+            transition: all 0.25s ease;
+        }
+        .opt-card.selected {
+            background-color: #EBF6F0 !important;
+            border-color: #7C9A92 !important;
+            box-shadow: 0 4px 14px rgba(124, 154, 146, 0.25);
+            transform: translateX(4px);
+        }
+
+        /* ===== 16种人格专属主题 CSS 类 ===== */
+        .theme-ISFP { --card-bg: linear-gradient(135deg, #FFF5F7 0%, #FFE3E8 100%); --border-col: #FFB6C1; --text-col: #8A4B56; }
+        .theme-ISTP { --card-bg: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); --border-col: #86EFAC; --text-col: #166534; }
+        .theme-ESFP { --card-bg: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); --border-col: #FCD34D; --text-col: #92400E; }
+        .theme-ESTP { --card-bg: linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%); --border-col: #FDBA74; --text-col: #9A3412; }
+        .theme-ISTJ { --card-bg: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%); --border-col: #CBD5E1; --text-col: #334155; }
+        .theme-ISFJ { --card-bg: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); --border-col: #FECDD3; --text-col: #9F1239; }
+        .theme-ESTJ { --card-bg: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); --border-col: #7DD3FC; --text-col: #075985; }
+        .theme-ESFJ { --card-bg: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%); --border-col: #FBCFE8; --text-col: #9D174D; }
+        .theme-INFJ { --card-bg: linear-gradient(135deg, #FAF5FF 0%, #F3E8FF 100%); --border-col: #D8B4FE; --text-col: #6B21A8; }
+        .theme-INTJ { --card-bg: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%); --border-col: #94A3B8; --text-col: #1E293B; }
+        .theme-INFP { --card-bg: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); --border-col: #6EE7B7; --text-col: #065F46; }
+        .theme-INTP { --card-bg: linear-gradient(135deg, #F0FDFA 0%, #CCFBF1 100%); --border-col: #5EEAD4; --text-col: #115E59; }
+        .theme-ENFP { --card-bg: linear-gradient(135deg, #FEFCE8 0%, #FEF08A 100%); --border-col: #FDE047; --text-col: #854D0E; }
+        .theme-ENTJ { --card-bg: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); --border-col: #FCA5A5; --text-col: #991B1B; }
+        .theme-ENFJ { --card-bg: linear-gradient(135deg, #ECFEFF 0%, #CFFAFE 100%); --border-col: #67E8F9; --text-col: #155E75; }
+        .theme-ENTP { --card-bg: linear-gradient(135deg, #FFEDD5 0%, #FED7AA 100%); --border-col: #FB923C; --text-col: #9A3412; }
+
+        .result-theme-card {
+            background: var(--card-bg, #FFFFFF);
+            border: 3px solid var(--border-col, #A3D9C9);
+            color: var(--text-col, #2D3748);
+        }
+    </style>
+</head>
+<body class="min-h-screen font-cute overflow-x-hidden text-slate-700 flex flex-col justify-between">
+
+<!-- 进度恢复弹窗 -->
+<div id="resumeModal" class="fixed inset-0 modal-mask z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-7 max-w-sm w-full fade-in text-center shadow-2xl border-4 border-amber-100">
+        <div class="text-4xl mb-2">📝</div>
+        <h3 class="text-xl font-bold mb-2 text-slate-800">检测到未完成的测评</h3>
+        <p class="text-slate-500 text-sm mb-6 leading-relaxed">你上次答题中途退出，可以继续作答，也可以重新开始</p>
+        <div class="flex gap-3">
+            <button id="resumeBtn" class="flex-1 bg-emerald-400 hover:bg-emerald-500 text-white font-bold py-3 rounded-2xl btn-bounce shadow-md">继续完成</button>
+            <button id="restartClearBtn" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-2xl btn-bounce">重新测试</button>
+        </div>
+    </div>
+</div>
+
+<!-- 启动动画页 -->
+<div id="startPage" class="fixed inset-0 z-40 bg-[#FBF9F3] flex flex-col items-center justify-center p-4 cursor-pointer select-none">
+    <h2 class="text-2xl sm:text-3xl text-slate-800 font-black mb-8 tracking-wide flex items-center gap-2">
+        <span>🥚</span> 蛋型MBTI性格测评
+    </h2>
+    <div class="grid grid-cols-4 gap-3 max-w-lg w-full">
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-pink-200 mx-auto flex items-center justify-center text-xs font-bold text-pink-700">ISFP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">艺术蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-lime-200 mx-auto flex items-center justify-center text-xs font-bold text-lime-800">ISTP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">自由蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-teal-200 mx-auto flex items-center justify-center text-xs font-bold text-teal-800">ESFP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">社交蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-amber-200 mx-auto flex items-center justify-center text-xs font-bold text-amber-800">ESTP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">潇洒蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-yellow-200 mx-auto flex items-center justify-center text-xs font-bold text-yellow-800">ISTJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">模范蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-rose-200 mx-auto flex items-center justify-center text-xs font-bold text-rose-800">ISFJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">守护蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-blue-200 mx-auto flex items-center justify-center text-xs font-bold text-blue-800">ESTJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">卷卷蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-pink-300 mx-auto flex items-center justify-center text-xs font-bold text-pink-800">ESFJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">天使蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-violet-200 mx-auto flex items-center justify-center text-xs font-bold text-violet-800">INFJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">神秘蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-stone-200 mx-auto flex items-center justify-center text-xs font-bold text-stone-700">INTJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">智慧蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-green-200 mx-auto flex items-center justify-center text-xs font-bold text-green-800">INFP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">精灵蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-sky-200 mx-auto flex items-center justify-center text-xs font-bold text-sky-800">INTP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">逻辑蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-emerald-200 mx-auto flex items-center justify-center text-xs font-bold text-emerald-800">ENFP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">活力蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-yellow-300 mx-auto flex items-center justify-center text-xs font-bold text-yellow-900">ENTJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">霸气蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-cyan-200 mx-auto flex items-center justify-center text-xs font-bold text-cyan-800">ENFJ</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">暖暖蛋</div>
+        </div>
+        <div class="egg-item text-center p-2 rounded-2xl bg-white shadow-sm border border-slate-100">
+            <div class="w-12 h-12 rounded-full bg-orange-200 mx-auto flex items-center justify-center text-xs font-bold text-orange-800">ENTP</div>
+            <div class="text-xs mt-1 font-medium text-slate-600">辩论蛋</div>
+        </div>
+    </div>
+    <p class="mt-8 text-xs sm:text-sm text-slate-400 font-medium animate-pulse">点击画面任意位置，或等待5秒开始测试</p>
+</div>
+
+<!-- 问卷页面 -->
+<div id="quizPage" class="hidden min-h-screen p-4 py-8 max-w-xl mx-auto w-full fade-in flex flex-col justify-center">
+    <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/60 p-6 sm:p-8 border-2 border-slate-100">
+        <!-- 头部与进度 -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold" id="dimTitle">维度标题</span>
+                <span class="text-xs font-bold text-slate-400">维度进度：<span id="progressText" class="text-emerald-600">1/4</span></span>
+            </div>
+            <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="bg-emerald-400 h-full transition-all duration-300 rounded-full" style="width: 1%"></div>
+            </div>
+        </div>
+
+        <!-- 题目 -->
+        <div class="my-6">
+            <h3 class="text-lg sm:text-xl font-bold text-slate-800 leading-snug" id="questionText">题目加载中</h3>
+        </div>
+
+        <!-- 选项 -->
+        <div class="space-y-3 mt-6" id="answerBox"></div>
+
+        <!-- 按钮 -->
+        <button id="nextBtn" class="w-full mt-8 bg-emerald-400 hover:bg-emerald-500 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-2xl btn-bounce shadow-lg shadow-emerald-200/50 transition-all text-base" disabled>
+            确定，进入下一题 ➔
+        </button>
+    </div>
+</div>
+
+<!-- 结果解析页面 -->
+<div id="resultPage" class="hidden min-h-screen p-4 py-8 max-w-xl mx-auto w-full fade-in flex flex-col justify-center">
+    <div id="resultCard" class="result-theme-card rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden transition-all duration-500">
+        <!-- 人格蛋头像区 -->
+        <div id="resultEggBox" class="w-28 h-28 mx-auto rounded-full mb-4 flex flex-col items-center justify-center text-xl font-black shadow-lg border-4 border-white/80 transition-transform duration-300 hover:scale-105"></div>
+        
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mb-6">
+            <span id="typeCode">----</span> <span id="typeName">蛋名称</span>
+        </h2>
+
+        <!-- 打字机解析展示区 -->
+        <div class="bg-white/80 backdrop-blur-md rounded-2xl p-5 sm:p-6 text-left text-slate-600 leading-relaxed whitespace-pre-line border border-white/50 shadow-inner font-medium text-sm sm:text-base min-h-[220px]" id="resultDesc">
+        </div>
+
+        <button onclick="restartTest()" class="mt-8 bg-amber-200 hover:bg-amber-300 text-amber-900 font-bold py-3.5 px-8 rounded-2xl btn-bounce shadow-md text-base">
+            🔄 重新测试
+        </button>
+    </div>
+</div>
+
+<script>
+// ===================== 100% 完整源码数据 =====================
+const DIMENSIONS = [
+    {
+        key:"EI",
+        title:"维度一：精力来源（E外向 / I内向）",
+        options: [
+            {q:"班级小组讨论，你更喜欢：", a:["(I)安静倾听，想好再举手，不主动抢话","(E)主动发言，愿意和同学热烈交流"]},
+            {q:"和好朋友玩一整天之后，你会：", a:["(I)有点累，想一个人安静待会儿","(E)很开心，还想继续一起玩"]},
+            {q:"认识新同学，一般是：", a:["(I)等对方先来和我说话","(E)主动上前打招呼"]},
+            {q:"遇到不会的题目：", a:["(I)先自己思考很久，实在不行再问别人","(E)很快去找同学、老师商量"]},
+            {q:"下课空闲时间，你更愿意：", a:["(I)自己看书、画画、独自玩","(E)拉上小伙伴一起游戏"]},
+            {q:"小组作业，你希望：", a:["(I)分到一部分任务，独立完成","(E)和大家不停讨论，一起做"]},
+            {q:"心里开心或者难过，你习惯：", a:["(I)放在心里，很少主动找人说","(E)第一时间和好朋友分享"]},
+            {q:"家人常常对你说：", a:["(I)多说话，别总是安安静静","(E)安静一点，不要一直叽叽喳喳"]},
+            {q:"心情不好的时候，怎样更容易平平复：", a:["(I)自己独处一会儿","(E)和朋友聊天陪伴"]},
+            {q:"放学路上碰到不熟的同班同学：", a:["(I)简单打个招呼就走开","(E)主动停下来聊几句"]},
+            {q:"一整天参加集体活动后：", a:["(I)感到疲惫，想要独处恢复","(E)兴奋，希望继续结伴活动"]},
+            {q:"空闲周末，你倾向：", a:["(I)独自发展爱好","(E)约同学出门游玩"]},
+            {q:"需要做出重要选择：", a:["(I)独立思考后决定","(E)询问亲友意见"]},
+            {q:"和欣赏的朋友初次相约：", a:["(I)安静内敛，多倾听","(E)主动分享趣事"]},
+            {q:"活动结束又收到新活动邀约：", a:["(I)想要早点回家休息","(E)兴致高涨愿意继续"]},
+            {q:"外出路上同行：", a:["(I)较少主动开启话题","(E)主动聊天分享见闻"]},
+            {q:"人多场合拍照：", a:["(I)不好意思，快速拍完离开","(E)大方摆姿势不在意目光"]},
+            {q:"独自迷路：", a:["(I)依靠导航","(E)主动向路人问路"]},
+            {q:"学习新爱好：", a:["(I)独自自学摸索","(E)和伙伴一同学习交流"]},
+            {q:"空白休息日：", a:["(I)独处放空休息","(E)和亲友出门活动"]}
+        ]
+    },
+    {
+        key:"SN",
+        title:"维度二：信息思考方式（S实感 / N直觉）",
+        options: [
+            {q:"老师讲新课，你更容易记住：",a:["(S)例题、步骤、课本知识点","(N)知识背后的联想、小故事"]},
+            {q:"读完一篇课文，最先关注：",a:["(S)故事发生的具体事件","(N)故事蕴含的道理"]},
+            {q:"别人和你讲述事情，你希望对方：",a:["(S)按顺序讲清细节","(N)先说重点，可以自由联想"]},
+            {q:"练习做题，你更信任：",a:["(S)见过的题型、成熟方法","(N)自己想到的新思路"]},
+            {q:"出门游玩，你更在意：",a:["(S)风景、美食、当下体验","(N)当地知识、新奇传说"]},
+            {q:"看到创新思考题：",a:["(S)寻找相似题型参考","(N)大胆尝试全新解法"]},
+            {q:"别人评价你描述事情：",a:["(S)记得大量细节","(N)想法跳脱容易联想别的事"]},
+            {q:"整理课堂笔记：",a:["(S)记录大量细节","(N)只记框架，写自己感悟"]},
+            {q:"畅想未来，更多想到：",a:["(S)现实可行的具体事情","(N)各种充满想象的可能性"]},
+            {q:"观察校园最先留意：",a:["(S)看得见的景物细节","(N)整体氛围与各种猜想"]},
+            {q:"学习新特长：",a:["(S)跟着标准步骤练习","(N)自由发挥尝试不同方式"]},
+            {q:"订正错题优先关注：",a:["(S)标准解题步骤与失误点","(N)思维深层漏洞"]},
+            {q:"规划短途出行：",a:["(S)关注当下体验","(N)好奇人文历史背景"]},
+            {q:"看待任务更喜欢：",a:["(S)明确具体操作要求","(N)长远目标与发展方向"]},
+            {q:"接受新任务：",a:["(S)重视实操细节","(N)重视整体方向"]},
+            {q:"阅读课外书：",a:["(S)关注情节事件","(N)关注主旨思想"]},
+            {q:"买东西时：",a:["(S)看重实用功能","(N)看重喜好与新鲜感"]},
+            {q:"遇到难题：",a:["(S)依靠过往经验","(N)依靠灵感直觉"]},
+            {q:"小组任务中你愿意：",a:["(S)落实细节执行","(N)构思创意方向"]},
+            {q:"回忆往事更容易记住：",a:["(S)当时画面细节","(N)这件事带来的启发"]}
+        ]
+    },
+    {
+        key:"TF",
+        title:"维度三：决策判断方式（T理性 / F共情）",
+        options: [
+            {q:"好友考试失利难过找你倾诉：",a:["(F)先安抚情绪陪伴对方","(T)理性分析失分，制定提升方案"]},
+            {q:"和同学发生矛盾：",a:["(F)优先修复关系，追求和睦","(T)分清对错，寻找客观解决方案"]},
+            {q:"小组讨论出现分歧：",a:["(F)照顾每个人感受寻求平衡","(T)选择逻辑最优方案"]},
+            {q:"评价故事更容易被打动：",a:["(F)人物之间温暖情感","(T)剧情逻辑结构"]},
+            {q:"同学觉得任务繁重抱怨：",a:["(F)体谅对方商量调整分工","(T)按照规则推进任务"]},
+            {q:"你理解的公平是：",a:["(F)体谅每个人不同处境","(T)统一标准人人均等"]},
+            {q:"朋友向你求助：",a:["(F)不想让对方失望尽量答应","(T)先判断事情合理性再决定"]},
+            {q:"看到同学被老师批评：",a:["(F)心疼对方情绪难堪","(T)客观分析对错缘由"]},
+            {q:"写作文更擅长：",a:["(F)描写情感心理","(T)说理论证观点"]},
+            {q:"和他人观点冲突：",a:["(F)避免争辩维持氛围","(T)愿意理性讨论理清逻辑"]},
+            {q:"挑选社团优先考虑：",a:["(F)有没有合得来的伙伴","(T)能否学到有用技能"]},
+            {q:"看见他人陷入困境：",a:["(F)第一时间感受对方痛苦","(T)第一时间思考解决办法"]},
+            {q:"朋友情感苦恼向你倾诉：",a:["(F)耐心倾听共情陪伴","(T)梳理问题寻找对策"]},
+            {q:"许久未见朋友发来文艺想念的话：",a:["(F)内心感动温暖","(T)好奇对方联想缘由"]},
+            {q:"朋友说心情不好去尝试新鲜事物：",a:["(F)关心情绪耐心倾听","(T)好奇打算做什么事"]},
+            {q:"同学吐槽烦躁约你出门：",a:["(F)追问发生的烦心事","(T)顺势提议一起活动"]},
+            {q:"反义词：放弃",a:["(F)坚持、不认输","(T)得到、获取"]},
+            {q:"别人评价你靠运气不用努力：",a:["(F)感到委屈自己付出很多","(T)觉得开心认可自身优势"]},
+            {q:"看到不幸的人物故事：",a:["(F)共情感到难过","(T)思考自救与解决方式"]},
+            {q:"与人争论时：",a:["(F)照顾对方感受维护关系","(T)理清事实讨论对错"]}
+        ]
+    },
+    {
+        key:"JP",
+        title:"维度四：行动规划模式（J规划 / P随性）",
+        options: [
+            {q:"寒暑假作业你习惯：",a:["(J)制定计划每日完成尽量提前","(P)临近截止集中赶工"]},
+            {q:"同时有多项学习任务：",a:["(J)逐项有序完成","(P)穿插交替进行"]},
+            {q:"周末学习娱乐安排：",a:["(J)规划时间段尽量执行","(P)无固定时间表随机安排"]},
+            {q:"书桌物品收纳：",a:["(J)分类摆放整齐","(P)随意放置需要再翻找"]},
+            {q:"外出研学活动你希望：",a:["(J)拿到完整行程安排","(P)预留大量自由时间"]},
+            {q:"考前复习：",a:["(J)清单逐项复习","(P)随性学到哪里算哪里"]},
+            {q:"计划被突发事件打乱：",a:["(J)容易烦躁希望恢复计划","(P)灵活调整适应变化"]},
+            {q:"预习新课：",a:["(J)顺着章节有序学习","(P)挑选感兴趣内容浏览"]},
+            {q:"答应别人的事情：",a:["(J)牢记准时完成","(P)经常需要他人提醒"]},
+            {q:"无截止日期任务：",a:["(J)尽早完成心里踏实","(P)延后等到有压力再行动"]},
+            {q:"计划出游确定目的地：",a:["(J)制定详细行程","(P)收集地点到达随机安排"]},
+            {q:"手头作业遇到紧急任务：",a:["(J)优先处理紧急任务","(P)做完当前任务再处理"]},
+            {q:"写作业时朋友邀约：",a:["(J)完成任务再赴约","(P)先出门回来补任务"]},
+            {q:"聚会遇上店铺限时活动：",a:["(J)遵守原定计划","(P)调整计划抓住优惠"]},
+            {q:"场地器材被占用：",a:["(J)等待按计划锻炼","(P)更换其他方式延后计划"]},
+            {q:"多种项目集体活动：",a:["(J)规划参与顺序","(P)现场随心选择参与"]},
+            {q:"整理房间大扫除：",a:["(J)分区分步清理","(P)想到哪里整理哪里"]},
+            {q:"超市采购学习用品：",a:["(J)按照清单购买","(P)随心添置喜欢物品"]},
+            {q:"约会碰面：",a:["(J)守时规划行程","(P)出门后随机应变"]},
+            {q:"学习任务和约会冲突：",a:["(J)先完成学习再玩乐","(P)先玩乐之后补任务"]}
+        ]
+    }
+];
+
+// 原版 16人格详细解析数据
+const PERSON_DATA = {
+    "ISFP":{name:"艺术蛋",color:"bg-pink-200",desc:`ISFP性格温润包容，很少与人起冲突，待人友善，能和身边大多数同学和睦相处。心思细腻敏锐，可以察觉到他人情绪变化，懂得体谅别人。
+他们拥有不错的审美与感知力，善于发现生活、文字、美术里细腻的美感。学习上更适合实操、赏析类内容，喜欢按照自己的节奏推进任务，不喜欢被严苛的计划束缚。更看重当下的体验，不太习惯提前制定长期目标。
+✅优势：共情力强、动手能力强、观察力细腻
+⚠️需要注意：遇到压力容易回避，容易拖延长期任务，不擅长主动表达内心想法
+💡学习建议：给自己设立简短的每日小目标；大胆说出自己的感受；把创意、审美运用在语文、美术、生物等学科。`},
+    "ISTP":{name:"自由蛋",color:"bg-lime-200",desc:`ISTP是行动派，比起空谈道理，更愿意动手尝试。遇事冷静客观，善于独立观察、分析问题，边界感清晰，不喜欢被过度管束。
+他们热爱新鲜体验，擅长理科实验、机械、体育等实操类学习内容，讨厌重复枯燥、僵化的条条框框。不愿意勉强自己迎合不喜欢的人和事。
+✅优势：临场应变强、动手能力突出、遇事沉着冷静
+⚠️需要注意：容易忽视长期规划；不喜主动沟通；有时会忽视他人情绪
+💡学习建议：学会适当兼顾他人感受；为重要学习任务建立基础时间表；多把实操思维运用在数理学科。`},
+    "ESFP":{name:"社交蛋",color:"bg-teal-200",desc:`ESFP精力充沛，擅长社交，乐于成为集体里活跃气氛的人，表达力强，善于感知现场氛围，很容易和同学打成一片。
+热爱新鲜体验，课堂、活动中敢于展示自己；擅长直观体验式学习，适合实践、展示、演讲类任务。
+✅优势：表达大方、亲和力强、临场表现优秀、善于调动氛围
+⚠️需要注意：很难长期专注枯燥的长期任务；容易忽略长远规划
+💡学习建议：制定阶段性学习目标；学会平衡娱乐与学习；尝试提前预习规划。`},
+    "ESTP":{name:"潇洒蛋",color:"bg-amber-200",desc:`ESTP头脑灵活、反应快，幽默健谈，适应力极强，乐于迎接挑战，擅长随机应变。
+学习上擅长实操、临场发挥，面对突发问题可以快速想出办法；讨厌冗长空洞的说教，重视现实可行的方法。
+✅优势：应变力强、行动果断、擅长实践、社交灵活
+⚠️需要注意：容易缺乏耐心，难以坚持长期枯燥学习；容易冲动行事
+💡学习建议：培养长期目标意识；坚持基础持续练习；做事前短暂冷静思考后果。`},
+    "ISTJ":{name:"模范蛋",color:"bg-yellow-200",desc:`ISTJ自律踏实，习惯按规则稳步前进，做事认真负责，信守承诺。学习上习惯按时完成任务，擅长整理笔记、落实基础知识点，是老师眼中靠谱的学生。
+他们拥有务实的价值标准，重视经验与已有方法，做事讲究条理，倾向稳步达成目标。
+✅优势：自律守信、执行力稳定、基础扎实、责任心强
+⚠️需要注意：不容易接纳新颖思路；面对突发变动容易焦虑；不擅长即兴发挥
+💡学习建议：适当尝试开放性思考题；学会灵活看待计划变化；主动尝试创新解题思路。`},
+    "ISFJ":{name:"守护蛋",color:"bg-rose-200",desc:`ISFJ十分在意身边氛围的和谐，乐于主动帮助同学、体谅他人情绪，细心周到，习惯默默留意身边人的需求。
+学习上踏实认真，愿意耐心帮助同伴答疑；重视过往经验，擅长稳步积累知识。常常习惯性迁就别人，容易忽视自身感受。
+✅优势：细心体贴、耐心充足、执行力稳定、乐于助人
+⚠️需要注意：容易过度付出、不懂拒绝；压抑自身情绪；害怕冲突
+💡学习建议：学会合理拒绝他人；优先照顾自己的学习任务；大胆表达真实想法。`},
+    "ESTJ":{name:"卷卷蛋",color:"bg-blue-200",desc:`ESTJ执行力强，目标清晰，擅长组织安排、统筹事务，天生适合担任班干部、小组负责人。做事讲究效率，看重学习与付出带来的实际收获。
+条理清晰，善于制定计划并推动落实，看重规则与公平。
+✅优势：组织能力强、自律高效、目标感足、责任心强
+⚠️需要注意：有时过于看重结果；容易忽略同伴情绪；不喜欢脱离计划的变化
+💡学习建议：多倾听他人不同想法；适当预留弹性时间；学会接纳多种解决方式。`},
+    "ESFJ":{name:"天使蛋",color:"bg-pink-300",desc:`ESFJ待人热忱，主动关心身边同学，善于维系友好的集体氛围，很在意身边人的情绪与感受。
+乐于配合集体活动，愿意主动帮助同伴；重视他人的认可，希望身边环境和睦融洽。
+✅优势：亲和力强、热心友善、善于协调人际关系、集体意识强
+⚠️需要注意：容易过度在意别人看法；难以拒绝他人；优先顾及别人而耽误自己任务
+💡学习建议：分清事情优先级；勇敢合理拒绝；优先保障自身学习安排。`},
+    "INFJ":{name:"神秘蛋",color:"bg-violet-200",desc:`INFJ善于思考事物背后的深层意义，共情敏锐，能感知他人隐藏的情绪，内心拥有清晰的价值底线。偏爱文学、人文类内容，喜欢探索精神层面的思考。
+学习上擅长归纳主旨、深度理解文本，不满足于单纯背诵知识点。理想感强，常常思考学习、生活的价值。
+✅优势：洞察力强、理解力深刻、善于独立深度思考
+⚠️需要注意：容易过度内耗；社交消耗大；想法过于理想化
+💡学习建议：预留充足独处时间；减少过度自我反思；把深度思考能力运用在阅读理解、议论文写作。`},
+    "INTJ":{name:"智慧蛋",color:"bg-stone-200",desc:`INTJ擅长长远规划，逻辑思维突出，喜欢独立思考解决难题，拥有大局观，追求高效。习惯提前设定长远目标，反向规划当下需要完成的任务。
+偏爱理科、思辨类内容，擅长搭建知识框架，不喜欢无意义的低效社交。
+✅优势：逻辑缜密、擅长规划、自主学习能力强、目标感强
+⚠️需要注意：容易忽视他人情绪；对低效的人和事缺乏耐心；计划被打乱容易烦躁
+💡学习建议：学习换位思考；预留弹性时间应对突发变化；主动和同学交流不同思路。`},
+    "INFP":{name:"精灵蛋",color:"bg-green-200",desc:`INFP拥有丰富的内心世界，善于感知微小美好，情感细腻，重视真诚与善意，向往纯粹的人际关系。
+擅长语文写作、文学赏析、艺术类内容，内心想法充沛，但常常害怕主动表达，在意他人评价，容易因为别人的态度自我怀疑。
+✅优势：想象力丰富、共情力强、文字表达富有感染力
+⚠️需要注意：容易拖延、情绪内耗；面对压力容易逃避；害怕冲突
+💡学习建议：建立简单可完成的短期任务；接纳不完美；坚持记录想法，发挥写作创意优势。`},
+    "INTP":{name:"逻辑蛋",color:"bg-sky-200",desc:`INTP思维发散、好奇心旺盛，喜欢钻研原理、讨论各类问题，乐于探索多种可能性。不喜欢死板的规则，向往精神自由。
+擅长数理、逻辑推理，喜欢刨根问底；感兴趣的内容会深度钻研，对枯燥重复的任务容易缺乏动力。
+✅优势：脑洞开阔、善于逻辑思辨、求知欲强
+⚠️需要注意：执行力偏弱，容易拖延；不太擅长落实琐碎基础任务
+💡学习建议：拆分大任务为短时小任务；固定基础练习时间；把思辨能力运用在理科探究。`},
+    "ENFP":{name:"活力蛋",color:"bg-emerald-200",desc:`ENFP乐观开朗，感染力强，想法丰富，乐于带动身边人，富有创意。看似永远阳光，内心同样敏感，负面情绪习惯独自消化。
+擅长创意写作、思辨讨论、开放性任务，灵感充沛，讨厌刻板重复的学习模式。
+✅优势：想象力丰富、感染力强、创意突出、善于启发同伴
+⚠️需要注意：兴趣容易转移；任务容易拖延；害怕枯燥重复训练
+💡学习建议：用多样化方式学习；设置任务截止提醒；把创意运用在作文、综合实践。`},
+    "ENTJ":{name:"霸气蛋",color:"bg-yellow-300",desc:`ENTJ视野长远，自信果断，擅长制定目标、统筹安排，拥有很强的组织领导能力，敢于直面挑战与变化。
+学习上擅长搭建知识体系，善于抓核心重点，适合复杂综合性任务。
+✅优势：目标宏大、决策果断、规划能力突出、抗压能力强
+⚠️需要注意：容易强势，忽略他人感受；耐心不足；难以接受低效方案
+💡学习建议：耐心倾听不同意见；适当放慢节奏；学会鼓励而非催促同伴。`},
+    "ENFJ":{name:"暖暖蛋",color:"bg-cyan-200",desc:`ENFJ善于沟通，拥有出色的社交能力，富有正言感，愿意主动帮助、鼓励身边同学，善于发现他人闪气点。
+适合组织活动、小组带领、演讲分享；内心有清晰的是非标准，希望带动身边人一起进步。
+✅优势：共情力强、善于沟通、号召力强、乐于助人
+⚠️需要注意：容易背负他人情绪；对他人期待过高；容易消耗自己
+💡学习建议：学会设立情绪边界；不必强行改变别人；留出自我休整时间。`},
+    "ENTP":{name:"辩论蛋",color:"bg-orange-200",desc:`ENTP思维敏捷，好奇心旺盛，善于发现逻辑漏洞，喜欢交流探讨不同观点，知识面广，适应各类话题。
+虽然擅长社交，但也需要独处充电；擅长文科思辨、理科探究、辩论赛、创新类任务。
+✅优势：思维灵活、知识面广、善于多角度思考、表达风趣
+⚠️需要注意：容易为辩论而争辩；难以坚持单调基础积累；想法多落地少
+💡学习建议：重视基础巩固；区分探讨观点和争执；选定想法之后坚持落地执行。`}
+};
+
+// ===================== 全局逻辑与状态 =====================
+let currentDim = 0;
+let currentQ = 0;
+let selectedAns = null;
+let dimCount = {I:0,E:0,S:0,N:0,T:0,F:0,J:0,P:0};
+let typingTimer = null;
+
+const startPage = document.getElementById("startPage");
+const quizPage = document.getElementById("quizPage");
+const resultPage = document.getElementById("resultPage");
+const dimTitle = document.getElementById("dimTitle");
+const questionText = document.getElementById("questionText");
+const answerBox = document.getElementById("answerBox");
+const nextBtn = document.getElementById("nextBtn");
+const progressText = document.getElementById("progressText");
+const progressBar = document.getElementById("progressBar");
+const resultEggBox = document.getElementById("resultEggBox");
+const typeCode = document.getElementById("typeCode");
+const typeName = document.getElementById("typeName");
+const resultDesc = document.getElementById("resultDesc");
+const resumeModal = document.getElementById("resumeModal");
+const resumeBtn = document.getElementById("resumeBtn");
+const restartClearBtn = document.getElementById("restartClearBtn");
+
+const STORAGE_KEY = "egg_mbti_save";
+
+// 本地进度存储/读取
+function loadSave(){
+    const str = localStorage.getItem(STORAGE_KEY);
+    if(!str) return null;
+    try{ return JSON.parse(str); }catch(e){ localStorage.removeItem(STORAGE_KEY); return null; }
+}
+
+function saveProgress(){
+    const data = { currentDim, currentQ, dimCount };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function clearSave(){
+    localStorage.removeItem(STORAGE_KEY);
+}
+
+// 自动计时跳转
+let timer = setTimeout(()=>{ goQuiz(); }, 5000);
+startPage.addEventListener("click", ()=>{
+    clearTimeout(timer);
+    goQuiz();
+});
+
+function goQuiz(){
+    startPage.classList.add("hidden");
+    quizPage.classList.remove("hidden");
+    loadQuestion();
+}
+
+// 加载题目
+function loadQuestion(){
+    const dim = DIMENSIONS[currentDim];
+    const qData = dim.options[currentQ];
+    
+    dimTitle.innerText = dim.title;
+    questionText.innerText = `${currentQ + 1}. ${qData.q}`;
+    answerBox.innerHTML = "";
+    selectedAns = null;
+    nextBtn.disabled = true;
+
+    // 更新进度条 UI (包含维度内 20 题与总 4 维度的全局比重)
+    const totalQInDim = dim.options.length; // 20
+    const globalProgressPct = Math.round(((currentDim * 20 + currentQ) / 80) * 100);
+    
+    progressText.innerText = `${currentDim + 1}/4 维 (第 ${currentQ + 1}/${totalQInDim} 题)`;
+    progressBar.style.width = `${globalProgressPct}%`;
+
+    qData.a.forEach((optText)=>{
+        const div = document.createElement("div");
+        div.className = "opt-card border-2 border-slate-100 bg-slate-50 hover:bg-emerald-50/50 p-4 rounded-2xl cursor-pointer font-medium text-slate-700 text-sm sm:text-base flex items-center gap-3 transition-all";
+        
+        // 匹配字母
+        const letter = optText.match(/\(([A-Z])\)/)?.[1] || '';
+        
+        div.innerHTML = `<span class="w-6 h-6 rounded-full bg-white text-slate-400 flex items-center justify-center text-xs font-bold border border-slate-200 shrink-0">🥚</span> <span>${optText}</span>`;
+        
+        div.onclick = ()=>{
+            selectedAns = letter;
+            document.querySelectorAll(".opt-card").forEach(d => d.classList.remove("selected"));
+            div.classList.add("selected");
+            nextBtn.disabled = false;
+        };
+        answerBox.appendChild(div);
+    });
+
+    saveProgress();
+}
+
+// 选项提交与维度跳转逻辑
+nextBtn.onclick = function(){
+    if(!selectedAns) return;
+
+    dimCount[selectedAns]++;
+    currentQ++;
+
+    const dim = DIMENSIONS[currentDim];
+    
+    // 如果当前维度的 20 道题目回答完毕
+    if(currentQ >= dim.options.length){
+        currentDim++;
+        currentQ = 0;
+    }
+
+    // 4个维度共80题全部完成，跳转结果页
+    if(currentDim >= DIMENSIONS.length){
+        clearSave();
+        showResult();
+    } else {
+        loadQuestion();
+    }
+};
+
+// 结果渲染及打字机与专属主题匹配
+function showResult(){
+    quizPage.classList.add("hidden");
+    resultPage.classList.remove("hidden");
+
+    // 计算最高得分为对应字母
+    const resultLetter = {
+        EI: dimCount.E >= dimCount.I ? "E" : "I",
+        SN: dimCount.S >= dimCount.N ? "S" : "N",
+        TF: dimCount.T >= dimCount.F ? "T" : "F",
+        JP: dimCount.J >= dimCount.P ? "J" : "P"
+    };
+
+    const finalType = resultLetter.EI + resultLetter.SN + resultLetter.TF + resultLetter.JP;
+    const data = PERSON_DATA[finalType] || PERSON_DATA["ISFP"];
+
+    // 设置人格专属主题背景样式
+    const resultCard = document.getElementById("resultCard");
+    resultCard.className = `result-theme-card theme-${finalType} rounded-3xl p-6 sm:p-8 text-center shadow-2xl relative overflow-hidden transition-all duration-500`;
+
+    typeCode.innerText = finalType;
+    typeName.innerText = data.name;
+
+    resultEggBox.className = `w-28 h-28 mx-auto rounded-full mb-4 flex items-center justify-center text-2xl font-black shadow-lg border-4 border-white/80 ${data.color}`;
+    resultEggBox.innerText = finalType;
+
+    // 执行解析文本打字机动画
+    typeWriter(data.desc, "resultDesc");
+}
+
+// 打字机呈现解析效果
+function typeWriter(text, targetId) {
+    const container = document.getElementById(targetId);
+    container.innerHTML = "";
+    
+    if (typingTimer) clearInterval(typingTimer);
+
+    let index = 0;
+    const cursor = document.createElement("span");
+    cursor.className = "typing-cursor";
+
+    typingTimer = setInterval(() => {
+        if (index < text.length) {
+            container.innerText = text.substring(0, index + 1);
+            container.appendChild(cursor);
+            index++;
+        } else {
+            clearInterval(typingTimer);
+            if (cursor.parentNode) {
+                cursor.parentNode.removeChild(cursor);
+            }
+        }
+    }, 25);
+}
+
+// 重新测试
+function restartTest(){
+    clearSave();
+    if (typingTimer) clearInterval(typingTimer);
+
+    currentDim = 0;
+    currentQ = 0;
+    dimCount = {I:0,E:0,S:0,N:0,T:0,F:0,J:0,P:0};
+
+    resultPage.classList.add("hidden");
+    quizPage.classList.remove("hidden");
+    loadQuestion();
+}
+
+// 恢复按钮事件绑定
+resumeBtn.onclick = function(){
+    resumeModal.classList.add("hidden");
+    startPage.classList.add("hidden");
+    quizPage.classList.remove("hidden");
+    loadQuestion();
+};
+
+restartClearBtn.onclick = function(){
+    clearSave();
+    currentDim = 0;
+    currentQ = 0;
+    dimCount = {I:0,E:0,S:0,N:0,T:0,F:0,J:0,P:0};
+    resumeModal.classList.add("hidden");
+};
+
+// 页面加载自动检测存档
+window.onload = function(){
+    const saveData = loadSave();
+    if(saveData && (saveData.currentDim > 0 || saveData.currentQ > 0)){
+        currentDim = saveData.currentDim || 0;
+        currentQ = saveData.currentQ || 0;
+        dimCount = saveData.dimCount || {I:0,E:0,S:0,N:0,T:0,F:0,J:0,P:0};
+        resumeModal.classList.remove("hidden");
+    }
+};
+</script>
+</body>
+</html>
